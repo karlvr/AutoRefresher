@@ -4,11 +4,12 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.refresh.IRefreshMonitor;
 import org.eclipse.core.resources.refresh.IRefreshResult;
 import org.eclipse.core.resources.refresh.RefreshProvider;
-import org.eclipse.core.runtime.CoreException;
 import org.vaadin.jonatan.nativefsevents.NativeFSEvents;
 import org.vaadin.jonatan.nativefsevents.NativeFSEvents.NativeFSEventListener;
 
 public class OSXRefreshProvider extends RefreshProvider {
+	
+//	private ExecutorService threadPool = Executors.newCachedThreadPool();
 
 	@Override
 	public IRefreshMonitor installMonitor(IResource resource,
@@ -26,9 +27,9 @@ public class OSXRefreshProvider extends RefreshProvider {
 			this.result = result;
 			start();
 		}
-
+		
 		private void start() {
-			String path = resource.getLocation().toOSString();
+			final String path = resource.getLocation().toOSString();
 			fsEvents = new NativeFSEvents(path, this);
 			fsEvents.startMonitoring();
 		}
@@ -41,11 +42,20 @@ public class OSXRefreshProvider extends RefreshProvider {
 		}
 
 		public void pathModified(String path) {
-			try {
-				resource.refreshLocal(IResource.DEPTH_INFINITE, null);
-			} catch (CoreException e) {
-				e.printStackTrace();
-			}
+//			threadPool.execute(new Runnable() {
+//
+//				@Override
+//				public void run() {
+//					try {
+//						resource.refreshLocal(IResource.DEPTH_INFINITE, null);
+//					} catch (CoreException e) {
+//						e.printStackTrace();
+//					}
+//				}
+//				
+//			});
+			
+			result.refresh(resource);
 		}
 	}
 }
